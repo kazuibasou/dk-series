@@ -47,10 +47,9 @@ Note that our code successfully works as long as each node's index is an integer
 There is no need for the node index to start at 0 or to increment by 1.
 
 #### Example
-Let's consider a network, named `example-network`, that consists of a set of nodes *V* = {0, 1, 2, 3, 4} and a set of edges *E* = {{0, 1}, {0, 4}, {1, 2}, {2, 3}, {3, 4}}. 
-Then, the input file is as follows:
+Let's consider a network that consists of a set of nodes *V* = {0, 1, 2, 3, 4} and a set of edges *E* = {{0, 1}, {0, 4}, {1, 2}, {2, 3}, {3, 4}}. 
+Then, the input file should be as follows:
 
-example-network.txt
 ``` text:
 0 1
 0 4
@@ -86,6 +85,8 @@ The *n* th (*n*=1, ..., *num_gen*) randomized network, i.e., *network*\_*d*\_*n*
 
 ### Notes
 - In general, when *d* = 0, 1, or 2, the code runs fast. When *d* = 2.5, it takes longer. 
+
+- Multiple edges and loops are allowed in randomized networks.
 
 ## Reference
 

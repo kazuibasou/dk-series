@@ -19,9 +19,18 @@ int write_network(const char *network, const std::string d, const int k, Network
 		exit(0);
 	}
 
+	int num_loop, i;
 	for(int v=0; v<randG.N; ++v){
+		num_loop = std::count(randG.nlist[v].begin(), randG.nlist[v].end(), v);
+		i = 0;
 		for(int w:randG.nlist[v]){
-			fprintf(f, "%d %d\n", G.index_to_node[v], G.index_to_node[w]);
+			if(w >= v){
+				fprintf(f, "%d %d\n", G.index_to_node[v], G.index_to_node[w]);
+			}
+			else if(w == v && i < int(num_loop)/2){
+				fprintf(f, "%d %d\n", G.index_to_node[v], G.index_to_node[w]);
+				i += 1;
+			}
 		}
 	}
 

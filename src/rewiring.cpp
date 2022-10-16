@@ -7,6 +7,43 @@
 #include "network.h"
 #include "rewiring.h"
 
+bool rewirable(const int &u1, const int &v1, const int &u2, const int &v2, 
+	const std::vector<int> &node_degree){
+	
+	if(u1 == v1){
+		return false;
+	}
+	else if(u1 == u2){
+		return false;
+	}
+	else if(u1 == v2){
+		return false;
+	}
+	else if(v1 == u2){
+		return false;
+	}
+	else if(v1 == v2){
+		return false;
+	}
+	else if(u2 == v2){
+		return false;
+	}
+	else if(node_degree[u1] == node_degree[u2]){
+		return true;
+	}
+	else if(node_degree[u1] == node_degree[v2]){
+		return true;
+	}
+	else if(node_degree[v1] == node_degree[u2]){
+		return true;
+	}
+	else if(node_degree[v1] == node_degree[v2]){
+		return true;
+	}
+	
+	return false;
+}
+
 int calculate_num_tri_to_add(Network &randG, const std::vector<int> &node_degree, 
 	const int &u1, const int &v1, const int &v2, std::vector<int> &num_tri_to_add){
 	
@@ -85,7 +122,7 @@ int targeting_rewiring_d_two_five(Network G, Network &randG){
 	std::vector<int> num_tri_to_add(k_size, 0);
 	int i_e1, i_e2, tmp;
 	int R = 500*M;
-	int r, u1, v1, u2, v2, t_minus;
+	int r, u1, v1, u2, v2, t_minus, rewiring_case;
 	std::pair<int, int> e1, e2;
 	double rewired_dist, delta_dist;
 
@@ -109,7 +146,7 @@ int targeting_rewiring_d_two_five(Network G, Network &randG){
 		u2 = e2.first;
 		v2 = e2.second;
 
-		while(u1 == u2 || v1 == v2 || node_degree[v1] != node_degree[v2]){
+		while(! rewirable(u1, v1, u2, v2, node_degree)){
 			i_e1 = randM(engine);
 			i_e2 = randM(engine);
 			e1 = edge_list[i_e1];
@@ -120,29 +157,66 @@ int targeting_rewiring_d_two_five(Network G, Network &randG){
 			v2 = e2.second;
 		}
 
-		calculate_num_tri_to_add(randG, node_degree, u1, v1, v2, num_tri_to_add);
-		calculate_num_tri_to_add(randG, node_degree, u2, v2, v1, num_tri_to_add);
+		if(node_degree[u1] == node_degree[u2] || node_degree[v1] == node_degree[v2]){
 
-		if(node_degree[v1] > 1 && node_degree[v2] > 1){
-			t_minus = std::count(randG.nlist[v1].begin(), randG.nlist[v1].end(), v2);
-			num_tri_to_add[node_degree[u1]] -= t_minus;
-			num_tri_to_add[node_degree[v1]] -= 2*t_minus;
-			num_tri_to_add[node_degree[u2]] -= t_minus;
-			num_tri_to_add[node_degree[v2]] -= 2*t_minus;
-		}
-		
-		if(node_degree[u1] > 1 && node_degree[u2] > 1){
-			t_minus = std::count(randG.nlist[u2].begin(), randG.nlist[u2].end(), u1);
-			if(node_degree[v1] > 1){
+			calculate_num_tri_to_add(randG, node_degree, u1, v1, v2, num_tri_to_add);
+			calculate_num_tri_to_add(randG, node_degree, u2, v2, v1, num_tri_to_add);
+
+			if(node_degree[v1] > 1 && node_degree[v2] > 1){
+				t_minus = std::count(randG.nlist[v1].begin(), randG.nlist[v1].end(), v2);
 				num_tri_to_add[node_degree[u1]] -= t_minus;
+				num_tri_to_add[node_degree[v1]] -= 2*t_minus;
 				num_tri_to_add[node_degree[u2]] -= t_minus;
-				num_tri_to_add[node_degree[v1]] -= t_minus;
+				num_tri_to_add[node_degree[v2]] -= 2*t_minus;
 			}
-			if(node_degree[v2] > 1){
+			
+			if(node_degree[u1] > 1 && node_degree[u2] > 1){
+				t_minus = std::count(randG.nlist[u2].begin(), randG.nlist[u2].end(), u1);
+				if(node_degree[v1] > 1){
+					num_tri_to_add[node_degree[u1]] -= t_minus;
+					num_tri_to_add[node_degree[u2]] -= t_minus;
+					num_tri_to_add[node_degree[v1]] -= t_minus;
+				}
+				if(node_degree[v2] > 1){
+					num_tri_to_add[node_degree[u1]] -= t_minus;
+					num_tri_to_add[node_degree[u2]] -= t_minus;
+					num_tri_to_add[node_degree[v2]] -= t_minus;
+				}
+			}
+
+			rewiring_case = 0;
+		}
+		else{
+			
+			calculate_num_tri_to_add(randG, node_degree, u1, v1, u2, num_tri_to_add);
+			calculate_num_tri_to_add(randG, node_degree, v2, u2, v1, num_tri_to_add);
+
+			if(node_degree[v1] > 1 && node_degree[u2] > 1){
+				t_minus = std::count(randG.nlist[v1].begin(), randG.nlist[v1].end(), u2);
 				num_tri_to_add[node_degree[u1]] -= t_minus;
-				num_tri_to_add[node_degree[u2]] -= t_minus;
+				num_tri_to_add[node_degree[v1]] -= 2*t_minus;
+				num_tri_to_add[node_degree[u2]] -= 2*t_minus;
 				num_tri_to_add[node_degree[v2]] -= t_minus;
 			}
+
+			if(node_degree[u1] > 1 && node_degree[v2] > 1){
+
+				t_minus = std::count(randG.nlist[v2].begin(), randG.nlist[v2].end(), u1);
+
+				if(node_degree[v1] > 1){
+					num_tri_to_add[node_degree[u1]] -= t_minus;
+					num_tri_to_add[node_degree[v2]] -= t_minus;
+					num_tri_to_add[node_degree[v1]] -= t_minus;
+				}
+				
+				if(node_degree[u2] > 1){
+					num_tri_to_add[node_degree[u1]] -= t_minus;
+					num_tri_to_add[node_degree[v2]] -= t_minus;
+					num_tri_to_add[node_degree[u2]] -= t_minus;
+				}
+			}
+
+			rewiring_case = 1;
 		}
 		
 		for(k=2; k<k_size; ++k){
@@ -154,14 +228,26 @@ int targeting_rewiring_d_two_five(Network G, Network &randG){
 		delta_dist = rewired_dist - dist;
 
 		if(delta_dist < 0){
-			randG.remove_edge(edge_list[i_e1].first, edge_list[i_e1].second);
-			randG.add_edge(edge_list[i_e1].first, edge_list[i_e2].second);
-			randG.remove_edge(edge_list[i_e2].first, edge_list[i_e2].second);
-			randG.add_edge(edge_list[i_e1].second, edge_list[i_e2].first);
+			if(rewiring_case == 0){
+				randG.remove_edge(edge_list[i_e1].first, edge_list[i_e1].second);
+				randG.add_edge(edge_list[i_e1].first, edge_list[i_e2].second);
+				randG.remove_edge(edge_list[i_e2].first, edge_list[i_e2].second);
+				randG.add_edge(edge_list[i_e1].second, edge_list[i_e2].first);
 
-			tmp = edge_list[i_e1].second;
-			edge_list[i_e1].second = edge_list[i_e2].second;
-			edge_list[i_e2].second = tmp;
+				tmp = edge_list[i_e1].second;
+				edge_list[i_e1].second = edge_list[i_e2].second;
+				edge_list[i_e2].second = tmp;
+			}
+			else{
+				randG.remove_edge(edge_list[i_e1].first, edge_list[i_e1].second);
+				randG.add_edge(edge_list[i_e1].first, edge_list[i_e2].first);
+				randG.remove_edge(edge_list[i_e2].first, edge_list[i_e2].second);
+				randG.add_edge(edge_list[i_e1].second, edge_list[i_e2].second);
+
+				tmp = edge_list[i_e1].second;
+				edge_list[i_e1].second = edge_list[i_e2].first;
+				edge_list[i_e2].first = tmp;
+			}
 
 			current_ddcc = std::vector<double>(rewired_ddcc);
 			dist = rewired_dist;
