@@ -1,5 +1,5 @@
 # dK-series
-dK-series is a family of randomization methods for networks.
+dK-series [1] is a family of randomization methods for networks.
 The dK-series produces randomized networks that preserve up to the individual node’s degree, node’s degree correlation, and node’s clustering coefficient of the given unweighted network, depending on the parameter value *d* = 0, 1, 2, or 2.5.
 
 We provide code for the dK-series in C++.

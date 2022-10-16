@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <set>
+#include <chrono>
 #include "network.h"
 #include "rewiring.h"
 
