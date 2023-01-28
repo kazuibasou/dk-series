@@ -16,9 +16,9 @@ We have confirmed that our code works in the following environment.
 
 	git clone git@github.com:kazuibasou/dk-series.git
 
-(ii) Go to `dk-series/cpp/src/`:
+(ii) Go to `dk-series/src/`:
 
-	cd dk-series/cpp/src
+	cd dk-series/src
 
 (iii) Run the make command:
 
@@ -32,7 +32,7 @@ This generates the following structure of the directory.
 	├ src/
 	└ rand_network/
 
-If you find a file `dk_series` in the folder `dk-series/cpp/bin/`, the build has been successfully completed.
+If you find a file `dk_series` in the folder `dk-series/bin/`, the build has been successfully completed.
 
 ## Usage
 
@@ -60,7 +60,7 @@ Then, the input file should be as follows:
 
 ### Generating randomized networks
 
-Go to `dk-series/cpp/bin/` and run the following command:
+Go to `dk-series/bin/` and run the following command:
 
 	./dk_series <network> <d> <num_gen>
 
@@ -76,7 +76,7 @@ The value of *d*, which should be 0, 1, 2, or 2.5.
 The number of networks to be generated.
 
 #### Example
-To generate three randomized networks with *d* = 2.5 for the network named `example-network`, go to `dk-series/cpp/bin/` and run the following command:
+To generate three randomized networks with *d* = 2.5 for the network named `example-network`, go to `dk-series/bin/` and run the following command:
 
 	./dk_series example-network 2.5 3
 
