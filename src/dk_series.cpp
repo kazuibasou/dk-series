@@ -25,7 +25,7 @@ int write_network(const char *network, const std::string d, const int k, Network
 		num_loop = std::count(randG.nlist[v].begin(), randG.nlist[v].end(), v);
 		i = 0;
 		for(int w:randG.nlist[v]){
-			if(w >= v){
+			if(w > v){
 				fprintf(f, "%d %d\n", G.index_to_node[v], G.index_to_node[w]);
 			}
 			else if(w == v && i < int(num_loop)/2){
