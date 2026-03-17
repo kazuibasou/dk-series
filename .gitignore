@@ -1,3 +1,9 @@
-/rand_network
+/cpp
+/bin
+/paper
 .DS_Store
+./tests
+pytest.ini
+**/__pycache__/
+.pytest_cache/
 

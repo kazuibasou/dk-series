@@ -1,56 +1,94 @@
-# dK-series
-dK-series [1] is a family of randomization methods for networks.
-The dK-series produces randomized networks that preserve up to the individual node’s degree, node’s degree correlation, and node’s clustering coefficient of the given unweighted network, depending on the parameter value *d* = 0, 1, 2, or 2.5.
+<h1 align="center">
+dK-series <br/>  
+<i>A family of reference models for unweighted graphs</i>
+</h1>
 
-We provide code for the dK-series in C++.
+<p align="center">
+<a href="https://github.com/kazuibasou/dk-series/blob/main/LICENSE" target="_blank">
+<img alt="License: MIT" src="https://img.shields.io/github/license/kazuibasou/dk-series">
+</a>
+
+<a href="https://doi.org/10.1109/ACCESS.2024.3459830" target="_blank">
+<img alt="DOI" src="https://img.shields.io/badge/DOI-10.1109%2FACCESS.2024.3459830-blue.svg">
+</a>
+
+</p>
+
+
+# dK-series
+
+dK-series [1] is a family of randomization methods for unweighted graphs (or pairwise networks).
+The dK-series produces randomized networks that preserve up to the individual node's degree, node's degree correlation, and node's clustering coefficient of the given unweighted network, depending on the parameter value *d* = 0, 1, 1.5, 2, or 2.5.
+In general, when *d* = 0 or 1, the code runs fast. When *d* = 1.5 or 2, it takes longer. When *d* = 2.5, it takes even longer than when *d* = 2.
+
+We provide a Python implementation of the dK-series.
+
+If you use this code, please cite:
+
+- [Takumi Sakiyama, Kazuki Nakajima, Masaki Aida. Efficient intervention in the spread of misinformation in social networks. *IEEE Access*. Vol. 12, pp. 133489–133498 (2024).](https://doi.org/10.1109/ACCESS.2024.3459830)
+
+# What's new
+
+- March 2026: We released a Python package `dk_series`. The package supports all *d* values (0, 1, 1.5, 2, 2.5) and provides exact simple graph sampling for *d* = 1 [[Del Genio et al. *PLOS ONE* (2010)]](https://doi.org/10.1371/journal.pone.0010012) and *d* = 2 [[Bassler et al. *New Journal of Physics* (2015)]](https://doi.org/10.1088/1367-2630/17/8/083052). The rewiring for *d* = 1.5 and 2.5 is accelerated with [Numba](https://numba.pydata.org/).
+
+---
 
 ## Requirements
-Require gcc version 4.2.1 or later.
 
-We have confirmed that our code works in the following environment.
+- Python 3.8+
+- NumPy
+- (Optional) NetworkX — for `to_networkx()`
+- (Optional) igraph — for `to_igraph()`
+- (Optional) Numba — for accelerated d=1.5 and d=2.5 rewiring
 
-- macOS 12.4
+## Installation
 
-## Build
-(i) Clone this repository:
+Install in editable mode from the repository root:
 
-	git clone git@github.com:kazuibasou/dk-series.git
+```bash
+pip install -e .
+```
 
-(ii) Go to `dk-series/src/`:
+Or add the repository root to your Python path:
 
-	cd dk-series/src
+```python
+import sys
+sys.path.insert(0, "/path/to/dk-series")
+import dk_series
+```
 
-(iii) Run the make command:
+## Quick start
 
-	make
+```python
+import dk_series
 
-This generates the following structure of the directory.
+# 1. Load a network
+edges, node_map = dk_series.read_network("data/soc-karate.txt")
 
-	dk-series/
-	├ bin/
-	├ data/
-	├ src/
-	└ rand_network/
+# 2. Randomize (d=2: preserves joint degree distribution)
+rand_edges = dk_series.randomize(edges, d=2, seed=42)
 
-If you find a file `dk_series` in the folder `dk-series/bin/`, the build has been successfully completed.
+# 3. Compare statistics with the original
+dk_series.compare(edges, rand_edges)
+```
 
-## Usage
+---
 
-### Input file
+## API Reference
 
-We need to feed a file, *network*.txt, where *network* indicates the name of the network and is arbitrary. 
-The file should be placed in `dk-series/data/`.
-In the file, each line contains two integers separated by a half-width space, which represents an edge between two nodes.
-This follows the standard network data format.
+### `read_network(filepath)`
 
-Note that our code successfully works as long as each node's index is an integer. 
-There is no need for the node index to start at 0 or to increment by 1.
+Read an edge-list file and return internal edge arrays.
 
-#### Example
-Let's consider a network that consists of a set of nodes *V* = {0, 1, 2, 3, 4} and a set of edges *E* = {{0, 1}, {0, 4}, {1, 2}, {2, 3}, {3, 4}}. 
-Then, the input file should be as follows:
+```python
+edges, node_map = dk_series.read_network("data/soc-karate.txt")
+# edges   : ndarray (M, 2) — edge array using internal indices (0..N-1)
+# node_map: ndarray (N,)   — node_map[i] = original node ID
+```
 
-``` text:
+Input file format (one edge per line as `u v`):
+
+```
 0 1
 0 4
 1 2
@@ -58,46 +96,129 @@ Then, the input file should be as follows:
 3 4
 ```
 
-### Generating randomized networks
+Lines starting with `#` and blank lines are ignored. Node IDs do not need to start at 0 or be consecutive.
 
-Go to `dk-series/bin/` and run the following command:
+---
 
-	./dk_series <network> <d> <num_gen>
+### `write_network(filepath, edges, node_map)`
 
-The three arguments are as follows.
+Write a randomized network to a file using the original node IDs.
 
-#### `<network>`
-The name of the network.
+```python
+dk_series.write_network("outputs/rand_karate.txt", rand_edges, node_map)
+```
 
-#### `<d>`
-The value of *d*, which should be 0, 1, 2, or 2.5.
+---
 
-#### `<num_gen>`
-The number of networks to be generated.
+### `randomize(edges, d, seed=None, num=1, rewiring_coeff=500, simple=True)`
 
-#### Example
-To generate three randomized networks with *d* = 2.5 for the network named `example-network`, go to `dk-series/bin/` and run the following command:
+Run dK-series randomization.
 
-	./dk_series example-network 2.5 3
+| Argument | Type | Description |
+|---|---|---|
+| `edges` | ndarray (M, 2) | Edge array returned by `read_network()` |
+| `d` | float | Randomization parameter (0, 1, 1.5, 2, or 2.5) |
+| `seed` | int or None | Random seed (recommended for reproducibility) |
+| `num` | int | Number of networks to generate; returns an ndarray directly if 1, a list if >1 |
+| `rewiring_coeff` | int | Rewiring attempt coefficient for d=1.5 and d=2.5 (attempts = rewiring_coeff × M) |
+| `simple` | bool | If `True`, output is guaranteed to be a simple graph (no self-loops, no multi-edges). Applies to d=1 and d=2. If `False` (default), uses a faster configuration-model approach that may produce self-loops or multi-edges. |
 
-### Output files
-The *n* th (*n*=1, ..., *num_gen*) randomized network, i.e., *network*\_*d*\_*n*.txt will be created in the folder `dk-series/rand_network/`.
+Statistics preserved by each value of `d`:
 
-### Notes
-- In general, when *d* = 0, 1, or 2, the code runs fast. When *d* = 2.5, it takes longer. 
+| d | Preserved statistics | Simple graph (`simple=True`) |
+|---|---|---|
+| 0 | Edge count only (fully random) | Yes — Erdős-Rényi G(N, M) |
+| 1 | Degree distribution P(k) | Yes |
+| 1.5 | Degree distribution P(k) + clustering coefficient (approximate) | Yes |
+| 2 | Degree distribution P(k) + joint degree distribution P(k,l) | Yes |
+| 2.5 | Degree distribution P(k) + P(k,l) + clustering coefficient (approximate) | Yes |
 
-- Multiple edges and loops are allowed in randomized networks.
+For d=0, `simple=True` generates an Erdős-Rényi G(N, M) graph via rejection sampling.
+For d=1, the exact sampling algorithm of Del Genio et al. (2010) [2] is used.
+For d=2, the joint degree matrix is preserved exactly using the algorithm of Bassler et al. (2015) [3].
+For d=1.5 and d=2.5, the rewiring step skips any candidate swap that would create a duplicate edge.
 
-## Reference
+```python
+# Default: faster, may contain self-loops or multi-edges
+rand_edges = dk_series.randomize(edges, d=2, seed=42)
+
+# Simple graph: no self-loops, no multi-edges
+rand_edges = dk_series.randomize(edges, d=2, seed=42, simple=True)
+
+# Generate multiple networks
+rand_list = dk_series.randomize(edges, d=2, seed=0, num=10)
+```
+
+---
+
+### `compare(orig_edges, rand_edges, verbose=True)`
+
+Compare statistics between the original and a randomized network.
+
+```python
+result = dk_series.compare(edges, rand_edges)
+# result['degree_dist_l1'] : L1 distance of degree distributions
+# result['jdm_l1']         : normalized L1 distance of joint degree distributions
+# result['ddcc_l1']        : normalized L1 distance of degree-dependent clustering coefficients
+```
+
+---
+
+### `compare_multiple(orig_edges, rand_edges_list, verbose=True)`
+
+Compare statistics across multiple randomized networks and report mean ± std.
+
+```python
+rand_list = dk_series.randomize(edges, d=2, seed=0, num=10)
+summary, results = dk_series.compare_multiple(edges, rand_list)
+# summary['degree_dist_l1'] = {'mean': ..., 'std': ...}
+```
+
+---
+
+### `to_networkx(edges, node_map=None)`
+
+Convert an edge array to a NetworkX graph.
+
+```python
+import networkx as nx
+G = dk_series.to_networkx(rand_edges, node_map)
+print(nx.average_clustering(G))
+```
+
+---
+
+### `to_igraph(edges, N, node_map=None)`
+
+Convert an edge array to an igraph graph.
+
+```python
+N = len(node_map)
+g = dk_series.to_igraph(rand_edges, N=N, node_map=node_map)
+print(g.transitivity_undirected())
+```
+
+---
+
+## Tutorial notebook
+
+See [`tutorial.ipynb`](tutorial.ipynb) for a step-by-step walkthrough.
+
+---
+
+## References
 
 [1] Orsini, C., Dankulov, M., Colomer-de-Simón, P. et al. Quantifying randomness in real networks. Nat. Commun. 6, 8627 (2015). [<a href="https://doi.org/10.1038/ncomms9627">paper</a>]
+
+[2] Del Genio, C. I., Kim, H., Toroczkai, Z., & Bassler, K. E. Efficient and exact sampling of simple graphs with given arbitrary degree sequence. PLOS ONE, 5(4), e10012 (2010). [<a href="https://doi.org/10.1371/journal.pone.0010012">paper</a>]
+
+[3] Bassler, K. E., Del Genio, C. I., Erdős, P. L., Miklós, I., & Toroczkai, Z. Exact sampling of graphs with prescribed degree correlations. New Journal of Physics, 17(8), 083052 (2015). [<a href="https://doi.org/10.1088/1367-2630/17/8/083052">paper</a>]
 
 ## License
 
 This source code is released under the MIT License, see LICENSE.txt.
 
 ## Contact
+
 - Kazuki Nakajima (https://kazuibasou.github.io/index_en.html)
 - kazuibasou[at]gmail.com
-
-(Last update: 2022/10/14)
