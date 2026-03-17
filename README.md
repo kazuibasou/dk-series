@@ -17,7 +17,7 @@ dK-series <br/>
 
 # dK-series
 
-dK-series [1] is a family of randomization methods for unweighted graphs (or pairwise networks).
+dK-series [1, 2] is a family of randomization methods (a.k.a. reference models and null models) for unweighted graphs (or pairwise networks).
 The dK-series produces randomized networks that preserve up to the individual node's degree, node's degree correlation, and node's clustering coefficient of the given unweighted network, depending on the parameter value *d* = 0, 1, 1.5, 2, or 2.5.
 In general, when *d* = 0 or 1, the code runs fast. When *d* = 1.5 or 2, it takes longer. When *d* = 2.5, it takes even longer than when *d* = 2.
 
@@ -134,8 +134,8 @@ Statistics preserved by each value of `d`:
 | 2.5 | Degree distribution P(k) + P(k,l) + clustering coefficient (approximate) | Yes |
 
 For d=0, `simple=True` generates an Erdős-Rényi G(N, M) graph via rejection sampling.
-For d=1, the exact sampling algorithm of Del Genio et al. (2010) [2] is used.
-For d=2, the joint degree matrix is preserved exactly using the algorithm of Bassler et al. (2015) [3].
+For d=1, the exact sampling algorithm of Del Genio et al. (2010) [3] is used.
+For d=2, the joint degree matrix is preserved exactly using the algorithm of Bassler et al. (2015) [4].
 For d=1.5 and d=2.5, the rewiring step skips any candidate swap that would create a duplicate edge.
 
 ```python
@@ -210,9 +210,11 @@ See [`tutorial.ipynb`](tutorial.ipynb) for a step-by-step walkthrough.
 
 [1] Orsini, C., Dankulov, M., Colomer-de-Simón, P. et al. Quantifying randomness in real networks. Nat. Commun. 6, 8627 (2015). [<a href="https://doi.org/10.1038/ncomms9627">paper</a>]
 
-[2] Del Genio, C. I., Kim, H., Toroczkai, Z., & Bassler, K. E. Efficient and exact sampling of simple graphs with given arbitrary degree sequence. PLOS ONE, 5(4), e10012 (2010). [<a href="https://doi.org/10.1371/journal.pone.0010012">paper</a>]
+[2] Mahadevan, P., Krioukov, D., Fall, K., & Vahdat, A. Systematic topology analysis and generation using degree correlations. SIGCOMM Comput. Commun. Rev., 36(4), 135–146 (2006). [<a href="https://doi.org/10.1145/1151659.1159930">paper</a>]
 
-[3] Bassler, K. E., Del Genio, C. I., Erdős, P. L., Miklós, I., & Toroczkai, Z. Exact sampling of graphs with prescribed degree correlations. New Journal of Physics, 17(8), 083052 (2015). [<a href="https://doi.org/10.1088/1367-2630/17/8/083052">paper</a>]
+[3] Del Genio, C. I., Kim, H., Toroczkai, Z., & Bassler, K. E. Efficient and exact sampling of simple graphs with given arbitrary degree sequence. PLOS ONE, 5(4), e10012 (2010). [<a href="https://doi.org/10.1371/journal.pone.0010012">paper</a>]
+
+[4] Bassler, K. E., Del Genio, C. I., Erdős, P. L., Miklós, I., & Toroczkai, Z. Exact sampling of graphs with prescribed degree correlations. New Journal of Physics, 17(8), 083052 (2015). [<a href="https://doi.org/10.1088/1367-2630/17/8/083052">paper</a>]
 
 ## License
 
