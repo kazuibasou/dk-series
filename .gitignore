@@ -4,6 +4,8 @@
 .DS_Store
 ./tests
 pytest.ini
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
 **/__pycache__/
 .pytest_cache/
 
