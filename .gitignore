@@ -2,7 +2,6 @@
 /bin
 /paper
 .DS_Store
-./tests
 pytest.ini
 .ipynb_checkpoints/
 **/.ipynb_checkpoints/
