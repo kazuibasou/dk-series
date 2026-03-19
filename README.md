@@ -8,10 +8,6 @@ dK-series <br/>
 <img alt="License: MIT" src="https://img.shields.io/github/license/kazuibasou/dk-series">
 </a>
 
-<a href="https://doi.org/10.1109/ACCESS.2024.3459830" target="_blank">
-<img alt="DOI" src="https://img.shields.io/badge/DOI-10.1109%2FACCESS.2024.3459830-blue.svg">
-</a>
-
 </p>
 
 
@@ -20,12 +16,7 @@ dK-series <br/>
 dK-series [1, 2, 3] is a family of randomization methods (a.k.a. reference models and null models) for unweighted graphs (or pairwise networks).
 The dK-series produces randomized networks that preserve up to the individual node's degree, node's degree correlation, and node's clustering coefficient of the given unweighted network, depending on the parameter value *d* = 0, 1, 1.5, 2, or 2.5.
 In general, when *d* = 0 or 1, the code runs fast. When *d* = 1.5 or 2, it takes longer. When *d* = 2.5, it takes even longer than when *d* = 2.
-
 We provide a Python implementation of the dK-series.
-
-If you use this code, please cite:
-
-- [Takumi Sakiyama, Kazuki Nakajima, Masaki Aida. Efficient intervention in the spread of misinformation in social networks. *IEEE Access*. Vol. 12, pp. 133489–133498 (2024).](https://doi.org/10.1109/ACCESS.2024.3459830)
 
 # What's new
 
